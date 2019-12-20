@@ -24,3 +24,8 @@ use vcal_1 v000 v005 v007 v008 v017 v018 v019 v208 b3_01 using "ZZIR62FL.DTA", c
 egen vcal_len = max(strlen(vcal_1))
 * most calendars are 80 in length, but those without method use may be short, so use the max
 label variable vcal_len "Length of calendar"
+
+* Step 2.2
+* position of last birth or terminated pregnancy in calendar
+gen lb = strpos(vcal_1,"B")
+gen lp = strpos(vcal_1,"T")
