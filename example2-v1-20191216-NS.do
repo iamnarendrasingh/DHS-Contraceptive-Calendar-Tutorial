@@ -12,3 +12,13 @@ cd "E:\Self_GitKraken\DHS-Contraceptive-Calendar-Tutorial\ZZIR62DT"
 * open the dataset to use, selecting just the variables we are going to use
 use vcal_1 v000 v005 v007 v008 v017 v018 v019 v208 b3_01 using "ZZIR62FL.DTA", clear
 
+* Example 2A
+* -----------------------
+* get century month code (CMC) of date of last birth or pregnancy from calendar 
+* using string functions
+
+
+* Step 2.1
+* length of full calendar string including leading blanks (80)
+* actual length used according to v019 will be less
+egen vcal_len = max(strlen(vcal_1))
