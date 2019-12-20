@@ -22,3 +22,5 @@ use vcal_1 v000 v005 v007 v008 v017 v018 v019 v208 b3_01 using "ZZIR62FL.DTA", c
 * length of full calendar string including leading blanks (80)
 * actual length used according to v019 will be less
 egen vcal_len = max(strlen(vcal_1))
+* most calendars are 80 in length, but those without method use may be short, so use the max
+label variable vcal_len "Length of calendar"
