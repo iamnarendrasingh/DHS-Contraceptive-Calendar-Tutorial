@@ -29,3 +29,10 @@ label variable vcal_len "Length of calendar"
 * position of last birth or terminated pregnancy in calendar
 gen lb = strpos(vcal_1,"B")
 gen lp = strpos(vcal_1,"T")
+* update lp with position of last birth if there was no terminated pregnancy, 
+* or if the last birth was more recent than last terminated pregnancy
+replace lp = lb if lp == 0 | (lb > 0 & lb < lp)
+* e.g. if calendar is as below ("_" used to replace blank for display here):
+* ______________00000BPPPPPPPP000000555555500000TPP00000000000000BPPPPPPPP00000000
+*                    ^
+* lp would be 20
