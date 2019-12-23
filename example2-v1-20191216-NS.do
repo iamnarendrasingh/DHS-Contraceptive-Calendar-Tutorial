@@ -39,3 +39,7 @@ replace lp = lb if lp == 0 | (lb > 0 & lb < lp)
 label variable lp "Position of last birth or terminated pregnancy in calendar"
 label def lp 0 "No birth or terminated pregnancy in calendar"
 label value lp lp
+* get the type of birth or terminated pregnancy
+* lp_type will be set to 1 if lp refers to a birth, 
+* and 2 if lp refers to a terminated pregnancy using the position in "BT" for the resulting code
+gen lp_type = strpos("BT",substr(vcal_1,lp,1)) if lp > 0 
