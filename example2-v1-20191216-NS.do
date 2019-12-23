@@ -46,3 +46,6 @@ gen lp_type = strpos("BT",substr(vcal_1,lp,1)) if lp > 0
 label variable lp_type "Birth or terminated pregnancy in calendar"
 label def lp_type 1 "Birth" 2 "Terminated pregnancy"
 label value lp_type lp_type
+
+
+list vcal_1 lp lp_type in 1/5
