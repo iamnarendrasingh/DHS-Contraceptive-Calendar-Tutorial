@@ -49,3 +49,4 @@ label value lp_type lp_type
 
 
 list vcal_1 lp lp_type in 1/5
+tab lp lp_type, m
