@@ -36,3 +36,6 @@ replace lp = lb if lp == 0 | (lb > 0 & lb < lp)
 * ______________00000BPPPPPPPP000000555555500000TPP00000000000000BPPPPPPPP00000000
 *                    ^
 * lp would be 20
+label variable lp "Position of last birth or terminated pregnancy in calendar"
+label def lp 0 "No birth or terminated pregnancy in calendar"
+label value lp lp
