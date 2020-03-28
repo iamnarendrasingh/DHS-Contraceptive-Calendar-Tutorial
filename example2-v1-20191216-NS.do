@@ -1,3 +1,7 @@
+cls
+clear 
+
+
 * DHS Calendar Tutorial - Example 2
 * Last pregnancy, duration of pregnancy and method used before pregnancy
 
@@ -6,11 +10,26 @@
 
 * change to a working directory where the data are stored
 * or add the full path to the 'use' command below
-cd "E:\Self_GitKraken\DHS-Contraceptive-Calendar-Tutorial\ZZIR62DT"
+cd "C:\Users\Narendra\Desktop\GitHub_online\Repo\DHS-Contraceptive-Calendar-Tutorial\ZZIR62DT"
 
 
 * open the dataset to use, selecting just the variables we are going to use
 use vcal_1 v000 v005 v007 v008 v017 v018 v019 v208 b3_01 using "ZZIR62FL.DTA", clear
+
+
+*Code by NS 
+*rename variable name 
+rename v000 CC
+rename v007 year_of_interview
+rename v008 date_of_interview
+rename v005  woman_individual_sample_weight
+rename v017 cmc_start_calendar
+rename v018 row_month_interview
+rename v019 length_of_interview
+rename b3_01 date_of_birth
+rename v208 birth_last_5_year
+
+
 
 * Example 2A
 * -----------------------
