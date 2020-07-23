@@ -10,7 +10,7 @@ clear
 
 * change to a working directory where the data are stored
 * or add the full path to the 'use' command below
-cd "C:\Users\Narendra\Desktop\GitHub_online\Repo\DHS-Contraceptive-Calendar-Tutorial\ZZIR62DT"
+cd "E:\Self_GitKraken\DHS-Contraceptive-Calendar-Tutorial\ZZIR62DT"
 
 
 * open the dataset to use, selecting just the variables we are going to use
