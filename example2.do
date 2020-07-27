@@ -18,6 +18,7 @@ use vcal_1 v000 v005 v007 v008 v017 v018 v019 v208 b3_01 using "ZZIR62FL.DTA", c
 * using string functions
 
 
+
 * Step 2.1
 * length of full calendar string including leading blanks (80)
 * actual length used according to v019 will be less
