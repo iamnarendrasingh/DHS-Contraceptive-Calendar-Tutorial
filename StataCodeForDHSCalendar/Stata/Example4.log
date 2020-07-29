@@ -1,0 +1,458 @@
+------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example4.log
+  log type:  text
+ opened on:  31 Aug 2017, 00:30:08
+
+. * DHS Calendar Tutorial - Example 4
+. * Stillbirths and perinatal mortality
+. 
+. * download the model dataset for individual women's recode: "ZZIR62FL.DTA" 
+. * the model datasets are available at http://dhsprogram.com/data/download-model-datasets.cfm
+. 
+. * change to a working directory where the data are stored
+. * or add the full path to the 'use' command below
+. cd "C:\Data\DHS_model\"
+C:\Data\DHS_model
+
+. 
+. * open the dataset to use, selecting just the variables we are going to use
+. use vcal_1 v000 v005 v007 v008 v018 v021 v023 v024 b3* b6* using "ZZIR62FL.DTA", clear
+
+. 
+. 
+. * Step 4.1
+. * Stillbirths
+. gen stillbirths = 0
+
+. label variable stillbirths "Stillbirths"
+
+. * Births in calendar
+. gen births = 0
+
+. label variable births "Births in calendar (excludes twins)"
+
+. * Births in birth history including twins in the five years preceding the survey
+. gen births2 = 0
+
+. label variable births2 "Births in birth history (including twins)"
+
+. * Early neonatal deaths in the five years preceding the survey
+. gen earlyneo = 0
+
+. label variable earlyneo "Early neonatal deaths"
+
+. 
+. 
+. * Step 4.2
+. * Set the start and end positions to use for the five year windows
+. gen beg = v018
+
+. gen end = v018+59
+
+. 
+. * Loop through calendar summing births, non-live pregnancies and stillbirths
+. * total length of calendar to loop over including leading blanks (80)
+. local vcal_len = strlen(vcal_1[1])
+
+. forvalues i = 1/`vcal_len' {
+  2.   * count the births, but restricting to just the 60 months preceding survey
+.   replace births = births+1 if inrange(`i',beg,end) & substr(vcal_1,`i',1) == "B"
+  3.   * count the stillbirths, also restricting to just the 60 months preceding survey
+.   replace stillbirths = stillbirths+1 if inrange(`i',beg,end) & ///
+>     substr(vcal_1,`i',7) == "TPPPPPP" 
+  4. } 
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(1 real change made)
+(0 real changes made)
+(15 real changes made)
+(0 real changes made)
+(36 real changes made)
+(0 real changes made)
+(59 real changes made)
+(2 real changes made)
+(105 real changes made)
+(2 real changes made)
+(112 real changes made)
+(0 real changes made)
+(115 real changes made)
+(2 real changes made)
+(117 real changes made)
+(1 real change made)
+(115 real changes made)
+(0 real changes made)
+(135 real changes made)
+(0 real changes made)
+(97 real changes made)
+(2 real changes made)
+(92 real changes made)
+(0 real changes made)
+(108 real changes made)
+(0 real changes made)
+(94 real changes made)
+(0 real changes made)
+(89 real changes made)
+(0 real changes made)
+(122 real changes made)
+(0 real changes made)
+(124 real changes made)
+(0 real changes made)
+(111 real changes made)
+(0 real changes made)
+(107 real changes made)
+(0 real changes made)
+(107 real changes made)
+(1 real change made)
+(97 real changes made)
+(1 real change made)
+(106 real changes made)
+(2 real changes made)
+(77 real changes made)
+(1 real change made)
+(60 real changes made)
+(0 real changes made)
+(72 real changes made)
+(1 real change made)
+(62 real changes made)
+(0 real changes made)
+(82 real changes made)
+(0 real changes made)
+(109 real changes made)
+(1 real change made)
+(109 real changes made)
+(1 real change made)
+(126 real changes made)
+(0 real changes made)
+(131 real changes made)
+(1 real change made)
+(107 real changes made)
+(0 real changes made)
+(86 real changes made)
+(1 real change made)
+(80 real changes made)
+(0 real changes made)
+(81 real changes made)
+(1 real change made)
+(65 real changes made)
+(0 real changes made)
+(66 real changes made)
+(0 real changes made)
+(80 real changes made)
+(3 real changes made)
+(107 real changes made)
+(1 real change made)
+(108 real changes made)
+(3 real changes made)
+(134 real changes made)
+(1 real change made)
+(122 real changes made)
+(1 real change made)
+(151 real changes made)
+(0 real changes made)
+(137 real changes made)
+(0 real changes made)
+(95 real changes made)
+(0 real changes made)
+(105 real changes made)
+(0 real changes made)
+(65 real changes made)
+(0 real changes made)
+(65 real changes made)
+(1 real change made)
+(62 real changes made)
+(0 real changes made)
+(70 real changes made)
+(0 real changes made)
+(92 real changes made)
+(3 real changes made)
+(83 real changes made)
+(1 real change made)
+(117 real changes made)
+(0 real changes made)
+(116 real changes made)
+(0 real changes made)
+(160 real changes made)
+(1 real change made)
+(142 real changes made)
+(1 real change made)
+(90 real changes made)
+(0 real changes made)
+(93 real changes made)
+(0 real changes made)
+(72 real changes made)
+(2 real changes made)
+(60 real changes made)
+(1 real change made)
+(41 real changes made)
+(0 real changes made)
+(47 real changes made)
+(2 real changes made)
+(37 real changes made)
+(1 real change made)
+(15 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. * Step 4.3
+. * reuse beg and end for CMCs range for the birth history
+. replace end = v008
+(8,348 real changes made)
+
+. replace beg = v008-59
+(8,348 real changes made)
+
+. 
+. * rename b3 and b6 variables to facilitate use in the for loop
+. rename b3_0* b3_*
+
+. rename b6_0* b6_*
+
+. 
+. * Loop through birth history summing births and early neonatal deaths
+. * in the five years preceding the survey
+. forvalues i = 1/20 {
+  2. * restrict to 60 months preceding survey
+.   replace births2 = births2+1 if inrange(b3_`i',beg,end)
+  3.   replace earlyneo = earlyneo+1 if inrange(b3_`i',beg,end) & inrange(b6_`i',100,106)
+  4. } 
+(4,260 real changes made)
+(106 real changes made)
+(1,531 real changes made)
+(49 real changes made)
+(169 real changes made)
+(7 real changes made)
+(8 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. * Step 4.4
+. * total pregnancies of 7+ months in last 5 years (all live births (including twins),
+. * plus the stillbirths)
+. gen totpreg7m = births2+stillbirths
+
+. label variable totpreg7m "Number of pregnancies of 7+ months duration"
+
+. 
+. * total perinatal mortality = early neonatal deaths plus stillbirths
+. gen perinatal = earlyneo+stillbirths
+
+. label variable perinatal "Perinatal mortality"
+
+. 
+. 
+. * Step 4.5
+. * create weight variable
+. gen wt = v005/1000000
+
+. 
+. * set up svyset parameters for complex samples
+. svyset v021 [pweight=wt], strata(v023)
+
+      pweight: wt
+          VCE: linearized
+  Single unit: missing
+     Strata 1: v023
+         SU 1: v021
+        FPC 1: <zero>
+
+. 
+. * number of stillbirths
+. * weight the number of women by the number of stillbirths for the correct count
+. replace wt = stillbirths*v005/1000000
+(8,306 real changes made)
+
+. svy: tab v024, cell count
+(running tabulate on estimation sample)
+
+Number of strata   =         7                  Number of obs     =      7,172
+Number of PSUs     =       190                  Population size   = 33.6578372
+                                                Design df         =        183
+
+----------------------------------
+   region |      count  proportion
+----------+-----------------------
+ region 1 |       15.8       .4695
+ region 2 |      5.365       .1594
+ region 3 |      1.384       .0411
+ region 4 |      11.11         .33
+          | 
+    Total |      33.66           1
+----------------------------------
+  Key:  count     =  weighted count
+        propor~n  =  cell proportion
+
+Note: 1 stratum omitted because it contains no population members.
+
+. * early neonatal deaths
+. * weight the number of women by the number of early neonatal deaths
+. replace wt = earlyneo*v005/1000000
+(194 real changes made)
+
+. svy: tab v024, cell count
+(running tabulate on estimation sample)
+
+Number of strata   =         8                  Number of obs     =      8,348
+Number of PSUs     =       217                  Population size   = 176.571694
+                                                Design df         =        209
+
+----------------------------------
+   region |      count  proportion
+----------+-----------------------
+ region 1 |      38.27       .2167
+ region 2 |      40.21       .2277
+ region 3 |      54.73         .31
+ region 4 |      43.36       .2456
+          | 
+    Total |      176.6           1
+----------------------------------
+  Key:  count     =  weighted count
+        propor~n  =  cell proportion
+
+. * number of pregnancies of 7+ months
+. * weight the number of women by the total number of pregnancies of 7+ months
+. replace wt = totpreg7m*v005/1000000
+(4,216 real changes made)
+
+. svy: tab v024, cell count
+(running tabulate on estimation sample)
+
+Number of strata   =         8                  Number of obs     =      8,348
+Number of PSUs     =       217                  Population size   = 5,906.0759
+                                                Design df         =        209
+
+----------------------------------
+   region |      count  proportion
+----------+-----------------------
+ region 1 |       2178       .3688
+ region 2 |       1315       .2226
+ region 3 |       1101       .1863
+ region 4 |       1313       .2223
+          | 
+    Total |       5906           1
+----------------------------------
+  Key:  count     =  weighted count
+        propor~n  =  cell proportion
+
+. 
+. * reset the weight variable
+. replace wt = v005/1000000
+(5,625 real changes made)
+
+. * perinatal mortality ratio
+. svy: ratio perinatal/totpreg7m
+(running ratio on estimation sample)
+
+Survey: Ratio estimation
+
+Number of strata =       8        Number of obs   =      8,348
+Number of PSUs   =     217        Population size = 8,347.9996
+                                  Design df       =        209
+
+     _ratio_1: perinatal/totpreg7m
+
+--------------------------------------------------------------
+             |             Linearized
+             |      Ratio   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+    _ratio_1 |   .0355955   .0031781      .0293303    .0418606
+--------------------------------------------------------------
+
+. svy: ratio perinatal/totpreg7m, over(v024)
+(running ratio on estimation sample)
+
+Survey: Ratio estimation
+
+Number of strata =       8        Number of obs   =      8,348
+Number of PSUs   =     217        Population size = 8,347.9996
+                                  Design df       =        209
+
+     _ratio_1: perinatal/totpreg7m
+
+    _subpop_1: v024 = region 1
+    _subpop_2: v024 = region 2
+    _subpop_3: v024 = region 3
+    _subpop_4: v024 = region 4
+
+--------------------------------------------------------------
+             |             Linearized
+        Over |      Ratio   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+_ratio_1     |
+   _subpop_1 |    .024825   .0039607      .0170169    .0326331
+   _subpop_2 |   .0346693   .0062962      .0222571    .0470815
+   _subpop_3 |   .0509912   .0113263      .0286628    .0733197
+   _subpop_4 |    .041484   .0056726      .0303011    .0526669
+--------------------------------------------------------------
+
+. 
+end of do-file
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example4.log
+  log type:  text
+ closed on:  31 Aug 2017, 00:30:09
+------------------------------------------------------------------------------------------------------------------------------------

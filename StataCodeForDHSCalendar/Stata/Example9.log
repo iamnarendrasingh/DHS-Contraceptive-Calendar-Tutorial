@@ -1,0 +1,1101 @@
+------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example9.log
+  log type:  text
+ opened on:   9 Sep 2018, 12:59:49
+
+. do Example`x'.do
+
+. * DHS Calendar Tutorial - Example 9
+. * Calculating discontinuation rates using event files
+. 
+. * note that the denominator in this table is all women, including sterilized women
+. * also includes missing methods to match the final reports
+. 
+. * if you don't have stcompet installed, use the line below to find it and follow instructions to install it:
+. //findit stcompet
+. 
+. * change to a working directory where the data are stored
+. * or add the full path to the 'use' command below
+. cd "C:\Data\DHS_model"
+C:\Data\DHS_model
+. 
+. * open the event file dataset created by the 'create events file.do'
+. use "eventsfile.dta", clear
+
+. 
+. 
+. * Step 1
+. * calculate exposure, late entries and censoring for the period 3-62 months prior to the interview
+. 
+. *gen wt
+. gen wt = v005/1000000
+
+. 
+. * drop events that were ongoing when calendar began
+. drop if v017 == ev900
+(8,348 observations deleted)
+
+. 
+. * drop births, terminations, pregnancies, and episodes of non-use
+. * keep missing methods. to exclude missing change 99 below to 100.
+. drop if (ev902 > 80 & ev902 < 99) | ev902==0 
+(21,401 observations deleted)
+
+. 
+. * time from beginning of event to interview
+. gen tbeg_int = v008 - ev900
+
+. label var tbeg_int "time from beginning of event to interview"
+
+. 
+. * time from end of event to interview
+. gen tend_int = v008 - ev901
+
+. label var tend_int "time from end of event to interview"
+
+. 
+. * discontinuation variable
+. gen discont = 0
+
+. replace discont = 1 if ev903 != 0
+(2,563 real changes made)
+
+. 
+. * censoring those who discontinue in last three months
+. replace discont = 0 if tend_int < 3
+(1,822 real changes made)
+
+. label var discont "discontinuation indicator"
+
+. tab discont
+
+discontinua |
+       tion |
+  indicator |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      1,822       71.09       71.09
+          1 |        741       28.91      100.00
+------------+-----------------------------------
+      Total |      2,563      100.00
+
+. tab ev903 discont, m
+
+                      |    discontinuation
+                      |       indicator
+ Discontinuation code |         0          1 |     Total
+----------------------+----------------------+----------
+Became pregnant while |         1         50 |        51 
+Wanted to become preg |         9        203 |       212 
+  Husband disapproved |         1         35 |        36 
+         Side effects |        17        274 |       291 
+  Access/availability |         1         14 |        15 
+Wanted more effective |         5         57 |        62 
+  Inconvenient to use |         3         29 |        32 
+Infrequent sex/husban |         2         18 |        20 
+                 Cost |         2          7 |         9 
+           Fatalistic |         0         17 |        17 
+Difficult to get preg |         0          2 |         2 
+                Other |         0          7 |         7 
+              Missing |         2         28 |        30 
+                    . |     1,779          0 |     1,779 
+----------------------+----------------------+----------
+                Total |     1,822        741 |     2,563 
+
+
+. 
+. * generate late entry variable
+. gen entry = 0
+
+. replace entry = tbeg_int - 62 if tbeg_int >= 63
+(48 real changes made)
+
+. tab tbeg_int entry
+
+ time from |
+ beginning |
+  of event |
+        to |                               entry
+ interview |         0          1          2          3          4          5 |     Total
+-----------+------------------------------------------------------------------+----------
+         0 |        40          0          0          0          0          0 |        40 
+         1 |        97          0          0          0          0          0 |        97 
+         2 |        70          0          0          0          0          0 |        70 
+         3 |        64          0          0          0          0          0 |        64 
+         4 |        55          0          0          0          0          0 |        55 
+         5 |        83          0          0          0          0          0 |        83 
+         6 |        95          0          0          0          0          0 |        95 
+         7 |        80          0          0          0          0          0 |        80 
+         8 |        68          0          0          0          0          0 |        68 
+         9 |        48          0          0          0          0          0 |        48 
+        10 |        49          0          0          0          0          0 |        49 
+        11 |        53          0          0          0          0          0 |        53 
+        12 |        76          0          0          0          0          0 |        76 
+        13 |        56          0          0          0          0          0 |        56 
+        14 |        45          0          0          0          0          0 |        45 
+        15 |        54          0          0          0          0          0 |        54 
+        16 |        60          0          0          0          0          0 |        60 
+        17 |        72          0          0          0          0          0 |        72 
+        18 |        74          0          0          0          0          0 |        74 
+        19 |        57          0          0          0          0          0 |        57 
+        20 |        59          0          0          0          0          0 |        59 
+        21 |        30          0          0          0          0          0 |        30 
+        22 |        21          0          0          0          0          0 |        21 
+        23 |        39          0          0          0          0          0 |        39 
+        24 |        40          0          0          0          0          0 |        40 
+        25 |        37          0          0          0          0          0 |        37 
+        26 |        38          0          0          0          0          0 |        38 
+        27 |        45          0          0          0          0          0 |        45 
+        28 |        46          0          0          0          0          0 |        46 
+        29 |        34          0          0          0          0          0 |        34 
+        30 |        50          0          0          0          0          0 |        50 
+        31 |        37          0          0          0          0          0 |        37 
+        32 |        33          0          0          0          0          0 |        33 
+        33 |        28          0          0          0          0          0 |        28 
+        34 |        24          0          0          0          0          0 |        24 
+        35 |        26          0          0          0          0          0 |        26 
+        36 |        43          0          0          0          0          0 |        43 
+        37 |        38          0          0          0          0          0 |        38 
+        38 |        36          0          0          0          0          0 |        36 
+        39 |        34          0          0          0          0          0 |        34 
+        40 |        39          0          0          0          0          0 |        39 
+        41 |        27          0          0          0          0          0 |        27 
+        42 |        27          0          0          0          0          0 |        27 
+        43 |        24          0          0          0          0          0 |        24 
+        44 |        27          0          0          0          0          0 |        27 
+        45 |        24          0          0          0          0          0 |        24 
+        46 |        13          0          0          0          0          0 |        13 
+        47 |        28          0          0          0          0          0 |        28 
+        48 |        27          0          0          0          0          0 |        27 
+        49 |        28          0          0          0          0          0 |        28 
+        50 |        18          0          0          0          0          0 |        18 
+        51 |        17          0          0          0          0          0 |        17 
+        52 |        22          0          0          0          0          0 |        22 
+        53 |        19          0          0          0          0          0 |        19 
+        54 |        26          0          0          0          0          0 |        26 
+        55 |        19          0          0          0          0          0 |        19 
+        56 |        21          0          0          0          0          0 |        21 
+        57 |        14          0          0          0          0          0 |        14 
+        58 |        11          0          0          0          0          0 |        11 
+        59 |         7          0          0          0          0          0 |         7 
+        60 |        13          0          0          0          0          0 |        13 
+        61 |        20          0          0          0          0          0 |        20 
+        62 |        10          0          0          0          0          0 |        10 
+        63 |         0         16          0          0          0          0 |        16 
+        64 |         0          0         18          0          0          0 |        18 
+        65 |         0          0          0         10          0          0 |        10 
+        66 |         0          0          0          0          2          0 |         2 
+        67 |         0          0          0          0          0          2 |         2 
+-----------+------------------------------------------------------------------+----------
+     Total |     2,515         16         18         10          2          2 |     2,563 
+
+
+. 
+. * taking away exposure time outside of the 3 to 62 month window
+. gen exposure = ev901a
+
+. replace exposure = ev901a - (3 - tend_int) if tend_int < 3
+(1,822 real changes made)
+
+. recode exposure -3/0=0
+(exposure: 137 changes made)
+
+. 
+. * drop those events that started in the month of the interview and two months prior
+. drop if tbeg_int < 3
+(207 observations deleted)
+
+. 
+. * drop events that started and ended before 62 months prior to survey
+. drop if tbeg_int > 62 & tend_int > 62
+(0 observations deleted)
+
+. 
+. * to remove sterilized women from denominator use the command below - not used for DHS standard
+. //replace exposure = . if ev902 == 6
+. 
+. * censor any discontinuations that are associated with use > 59 months
+. * not censored in this example
+. //replace discont = 0 if (exposure - entry) > 59
+. 
+. 
+. * Step 2 
+. * recode methods, discontinuation reason, and construct switching
+. 
+. * recode contraceptive method
+. * IUD, Periodic Abstinence, and Withdrawal skipped and grouped with other due to small numbers of cases
+. recode ev902                                            ///
+>         (1  = 1 "Pill")                                 ///
+> /*      (2  = 2 "IUD") */                               ///
+>         (3  = 3 "Injectables")                  ///
+>         (11 = 4 "Implant")                              ///
+>         (5  = 5 "Male condom")                  ///
+> /*      (8  = 6 "Periodic abstinence") */  ///
+> /*      (9  = 7 "Withdrawal") */                ///
+>         (13 18 = 8 "LAM/EC")                    ///
+>         (nonmissing = 9 "Other")                ///
+>         (missing = .), gen(method)
+(646 differences between ev902 and method)
+
+. tab ev902 method, m
+
+                      |                   RECODE of ev902 (Event code)
+           Event code |      Pill  Injectabl    Implant  Male cond     LAM/EC      Other |     Total
+----------------------+------------------------------------------------------------------+----------
+                 Pill |       587          0          0          0          0          0 |       587 
+                  IUD |         0          0          0          0          0         36 |        36 
+           Injectable |         0      1,029          0          0          0          0 |     1,029 
+               Condom |         0          0          0         80          0          0 |        80 
+ Female sterilization |         0          0          0          0          0         18 |        18 
+   Male sterilization |         0          0          0          0          0          1 |         1 
+Periodic abstinence/R |         0          0          0          0          0         12 |        12 
+           Withdrawal |         0          0          0          0          0         14 |        14 
+Other traditional met |         0          0          0          0          0         73 |        73 
+             Norplant |         0          0        374          0          0          0 |       374 
+Lactational amenorrhe |         0          0          0          0        114          0 |       114 
+        Female condom |         0          0          0          0          0          1 |         1 
+  Other modern method |         0          0          0          0          0         17 |        17 
+----------------------+------------------------------------------------------------------+----------
+                Total |       587      1,029        374         80        114        172 |     2,356 
+
+
+. * LAM and Emergency contraception are grouped here
+. * Other category is Female Sterilization, Male sterilization, Other Traditional, 
+. *       Female Condom, Other Modern, Standard Days Method
+. * plus IUD, Periodic Abstinence, Withdrawal
+. * adjust global meth_list below if changing the grouping of methods above
+. 
+. * change name of reasons label list to avoid labels we don't want 
+. label copy reason ev903
+
+. label val ev903 ev903
+
+. label drop reason // we don't want the labels for reason being copied to var reason
+
+. 
+. * recode reasons for discontinuation - ignoring switching
+. recode ev903                                                                    ///
+>         (0 .     = .)                                                           ///
+>         (1       = 1 "Method failure")                          ///
+>         (2       = 2 "Desire to become pregnant")               ///
+>         (9 12 13 = 3 "Other fertility related reasons") ///
+>         (4 5     = 4 "Side effects/health concerns")    ///
+>         (7       = 5 "Wanted more effective method")    ///
+>         (6 8 10  = 6 "Other method related")                    ///
+>         (nonmissing = 7 "Other/DK") if discont==1, gen(reason)
+(200 differences between ev903 and reason)
+
+. label var reason "Reason for discontinuation"
+
+. tab reason
+
+     Reason for discontinuation |      Freq.     Percent        Cum.
+--------------------------------+-----------------------------------
+                 Method failure |         50        6.75        6.75
+      Desire to become pregnant |        203       27.40       34.14
+Other fertility related reasons |         20        2.70       36.84
+   Side effects/health concerns |        274       36.98       73.82
+   Wanted more effective method |         57        7.69       81.51
+           Other method related |         50        6.75       88.26
+                       Other/DK |         87       11.74      100.00
+--------------------------------+-----------------------------------
+                          Total |        741      100.00
+
+. tab ev903 reason if discont==1, m
+
+                      |                          Reason for discontinuation
+ Discontinuation code | Method fa  Desire to  Other fer  Side effe  Wanted mo  Other met   Other/DK |     Total
+----------------------+-----------------------------------------------------------------------------+----------
+Became pregnant while |        50          0          0          0          0          0          0 |        50 
+Wanted to become preg |         0        203          0          0          0          0          0 |       203 
+  Husband disapproved |         0          0          0          0          0          0         35 |        35 
+         Side effects |         0          0          0        274          0          0          0 |       274 
+  Access/availability |         0          0          0          0          0         14          0 |        14 
+Wanted more effective |         0          0          0          0         57          0          0 |        57 
+  Inconvenient to use |         0          0          0          0          0         29          0 |        29 
+Infrequent sex/husban |         0          0         18          0          0          0          0 |        18 
+                 Cost |         0          0          0          0          0          7          0 |         7 
+           Fatalistic |         0          0          0          0          0          0         17 |        17 
+Difficult to get preg |         0          0          2          0          0          0          0 |         2 
+                Other |         0          0          0          0          0          0          7 |         7 
+              Missing |         0          0          0          0          0          0         28 |        28 
+----------------------+-----------------------------------------------------------------------------+----------
+                Total |        50        203         20        274         57         50         87 |       741 
+
+
+. 
+. * switching methods
+. * switching directly from one method to the next, with no gap
+. sort caseid ev004
+
+. by caseid: gen switch = 1 if ev901+1 == ev900[_n+1]
+(2,237 missing values generated)
+
+. * if reason was "wanted more effective method" allow for a 1-month gap
+. by caseid: replace switch = 1 if ev903 == 7 & ev901+2 >= ev900[_n+1] & ev905 == 0
+(2 real changes made)
+
+. * not a switch if returned back to the same method
+. * note that these are likely rare, so there may be no or few changes from this command
+. by caseid: replace switch = . if ev902 == ev902[_n+1] & ev901+1 == ev900[_n+1]
+(0 real changes made)
+
+. tab switch
+
+     switch |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        121      100.00      100.00
+------------+-----------------------------------
+      Total |        121      100.00
+
+. 
+. * calculate variable for switching for discontinuations we are using
+. gen discont_sw = .
+(2,356 missing values generated)
+
+. replace discont_sw = 1 if switch == 1 & discont == 1
+(121 real changes made)
+
+. replace discont_sw = 2 if discont_sw == . & ev903 != 0 & ev903 != . & discont == 1
+(620 real changes made)
+
+. label def discont_sw 1 "switch" 2 "other reason"
+
+. label val discont_sw discont_sw
+
+. tab discont_sw
+
+  discont_sw |      Freq.     Percent        Cum.
+-------------+-----------------------------------
+      switch |        121       16.33       16.33
+other reason |        620       83.67      100.00
+-------------+-----------------------------------
+       Total |        741      100.00
+
+. 
+. 
+. * Step 3
+. * Calculate the competing risks cumulative incidence for each method and for all methods
+. 
+. * create global lists of the method variables included
+. levelsof method
+1 3 4 5 8 9
+
+. global meth_codes `r(levels)'
+
+. *modify meth_list and methods_list according to the methods included
+. *global meth_list pill IUD inj impl mcondom pabst withdr lamec other
+. *global methods_list `" "Pill" "IUD" "Injectables" "Implant" "Male condom" "Periodic abstinence" "Withdrawal" "LAM/EC" "Other" "All meth
+> ods" "'
+. global meth_list pill inj impl mcondom lamec other
+
+. global methods_list `" "Pill" "Injectables" "Implant" "Male condom" "LAM/EC" "Other" "All methods" "'
+
+. global drate_list 
+
+. global drate_list_sw 
+
+. foreach m in $meth_list {
+  2.         global drate_list $drate_list drate_`m'
+  3.         global drate_list_sw $drate_list_sw drate_`m'_sw
+  4. }
+
+. 
+. * competing risks estimates - first all methods and then by method
+. tokenize allmeth $meth_list
+
+. foreach x in 0 $meth_codes {
+  2. 
+.         * by reason - no switching
+.         * declare time series data for st commands
+.         stset exposure if `x' == 0 | method == `x' [iw=wt], failure(reason==1) enter(entry)
+  3.         stcompet discont_`1' = ci, compet1(2) compet2(3) compet3(4) compet4(5) compet5(6) compet6(7) 
+  4.         * convert rate to percentage
+.         gen drate_`1' = discont_`1' * 100
+  5. 
+.         * switching
+.         * declare time series data for st commands
+.         stset exposure if `x' == 0 | method == `x' [iw=wt], failure(discont_sw==1) enter(entry)
+  6.         stcompet discont_`1'_sw = ci, compet1(2) 
+  7.         * convert rate to percentage
+.         gen drate_`1'_sw = discont_`1'_sw * 100
+  8. 
+.         * Get the label for the method and label the variables appropriately
+.         local lab1 All methods
+  9.         if `x' > 0 {
+ 10.                 local lab1 : label method `x'
+ 11.         }
+ 12.         label var drate_`1' "Rate for `lab1'"
+ 13.         label var drate_`1'_sw "Rate for `lab1' for switching"
+ 14.         
+.         * shift to next method name in token list
+.         macro shift
+ 15. }
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  0 == 0 | method == 0 
+
+------------------------------------------------------------------------------
+       2356  total observations
+          0  exclusions
+------------------------------------------------------------------------------
+       2356  observations remaining, representing
+         50  failures in single-record/single-failure data
+      41691  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        65
+(1,615 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  0 == 0 | method == 0 
+
+------------------------------------------------------------------------------
+       2356  total observations
+          0  exclusions
+------------------------------------------------------------------------------
+       2356  observations remaining, representing
+        121  failures in single-record/single-failure data
+      41691  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        65
+(1,615 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  1 == 0 | method == 1 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1769  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        587  observations remaining, representing
+         25  failures in single-record/single-failure data
+      10389  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,134 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  1 == 0 | method == 1 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1769  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        587  observations remaining, representing
+         35  failures in single-record/single-failure data
+      10389  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,134 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  3 == 0 | method == 3 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1327  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+       1029  observations remaining, representing
+         12  failures in single-record/single-failure data
+      17301  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        65
+(2,046 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  3 == 0 | method == 3 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1327  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+       1029  observations remaining, representing
+         34  failures in single-record/single-failure data
+      17301  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        65
+(2,046 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  4 == 0 | method == 4 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1982  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        374  observations remaining, representing
+          0  failures in single-record/single-failure data
+       7385  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,293 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  4 == 0 | method == 4 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       1982  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        374  observations remaining, representing
+         14  failures in single-record/single-failure data
+       7385  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,293 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  5 == 0 | method == 5 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2276  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+         80  observations remaining, representing
+          3  failures in single-record/single-failure data
+       1325  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        60
+(2,319 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  5 == 0 | method == 5 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2276  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+         80  observations remaining, representing
+         21  failures in single-record/single-failure data
+       1325  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        60
+(2,319 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  8 == 0 | method == 8 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2242  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        114  observations remaining, representing
+          2  failures in single-record/single-failure data
+       1379  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        34
+(2,293 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  8 == 0 | method == 8 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2242  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        114  observations remaining, representing
+          5  failures in single-record/single-failure data
+       1379  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        34
+(2,293 missing values generated)
+
+     failure event:  reason == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  9 == 0 | method == 9 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2184  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        172  observations remaining, representing
+          8  failures in single-record/single-failure data
+       3912  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,310 missing values generated)
+
+     failure event:  discont_sw == 1
+obs. time interval:  (0, exposure]
+ enter on or after:  time entry
+ exit on or before:  failure
+            weight:  [iweight=wt]
+            if exp:  9 == 0 | method == 9 
+
+------------------------------------------------------------------------------
+       2356  total observations
+       2184  ignored at outset because of -if <exp>-
+------------------------------------------------------------------------------
+        172  observations remaining, representing
+         12  failures in single-record/single-failure data
+       3912  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =        63
+(2,310 missing values generated)
+
+. 
+. * keep just the variables we need for output
+. keep caseid method drate* exposure reason discont_sw wt entry
+
+. 
+. * save data file with cumulative incidence variables added to each case
+. save "drates.dta", replace
+(note: file drates.dta not found)
+file drates.dta saved
+
+. 
+. 
+. * Step 4
+. * calculate and save the weighted and unweighted denominators
+. * and convert into format for adding to dataset of results
+. 
+. * calculate unweighted Ns, for entries in the first month of the life table
+. drop if entry != 0
+(48 observations deleted)
+
+. collapse (count) methodNunwt = entry, by(method)
+
+. save "method_Ns.dta", replace
+(note: file method_Ns.dta not found)
+file method_Ns.dta saved
+
+. 
+. use "drates.dta", clear
+
+. * calculate weighted Ns, for total episodes including late entries
+. collapse (count) methodNwt = entry [iw=wt], by(method)
+
+. 
+. * merge in the unweighted Ns
+. merge 1:1 method using "method_Ns.dta"
+(label method already defined)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                                 6  (_merge==3)
+    -----------------------------------------
+
+. 
+. * drop the merge variable
+. drop _merge
+
+. 
+. * switch rows (methods) and columns (weighted and unweighted counts)
+. * to create a file that will have a row for weight Ns and a row for unweighted Ns with methods as the variables
+. * first transpose the file
+. xpose, clear
+
+. * rename the variables v1 to v9 to match the drate variable list (ignoring all methods)
+. tokenize $drate_list
+
+. local num : list sizeof global(drate_list)
+
+. forvalues x = 1/`num' { // this list is a sequential list of numbers up to the count of vars
+  2.         rename v`x' `1'
+  3.         mac shift
+  4. }
+
+. * drop the first line with the method code as the methods are now variables
+. drop if _n == 1
+(1 observation deleted)
+
+. * generate the reason code (to be used last for the Ns)
+. gen reason = 9 + _n
+
+. 
+. * save the final Ns - two rows, one for weighhted N, one for unweighted N
+. save "method_Ns.dta", replace
+file method_Ns.dta saved
+
+. 
+. 
+. * Step 5 Combine components for results output
+. 
+. * Prepare resulting data for output
+. * This code can be used to produce rates for different durations for use, 
+. * but is here set for 12-month discontinuation rates
+. 
+. * Loop through possible discontinuation rates for 6, 12, 24 and 36 months
+. //foreach x in 6 12 24 36 {
+. * current version presents only 12-month discontinuation rates:
+. local x 12
+
+. 
+. * open the working file with the rates attached to each case
+. use "drates.dta", clear 
+
+. 
+. * collect information from relevant time period only
+. drop if exposure > `x'
+(1,278 observations deleted)
+
+. 
+. * keep only discontinuation information
+. keep method drate* exposure reason discont_sw wt
+
+. 
+. * save smaller dataset for x-month duration which we will use in collapse commands below
+. save "drates_`x'm.dta", replace
+(note: file drates_12m.dta not found)
+file drates_12m.dta saved
+
+. 
+. * collapsing data for reasons, all reasons, switching, merging and adding method Ns
+. 
+. * reasons for discontinuation
+. * collapse data by discontinuation category and save
+. collapse (max) $drate_list drate_allmeth, by(reason)
+
+. * drop missing values
+. drop if reason == .
+(1 observation deleted)
+
+. save "reasons.dta", replace
+(note: file reasons.dta not found)
+file reasons.dta saved
+
+. 
+. * All reasons
+. * calculate total discontinuation and save
+. collapse (sum) $drate_list drate_allmeth
+
+. gen reason = 8
+
+. save "allreasons.dta", replace
+(note: file allreasons.dta not found)
+file allreasons.dta saved
+
+. 
+. * switching data
+. use "drates_`x'm.dta"
+
+. * collapse and save a file just for switching
+. collapse (max) $drate_list_sw drate_allmeth_sw, by(discont_sw)
+
+. * only keep row for switching, not for other reasons
+. drop if discont_sw != 1
+(2 observations deleted)
+
+. * we no longer need discont_sw and don't want it in the resulting file
+. drop discont_sw 
+
+. gen reason = 9  // switching
+
+. * rename switching variables to match the non-switching names
+. rename drate_*_sw drate_*
+
+. save "switching.dta", replace
+(note: file switching.dta not found)
+file switching.dta saved
+
+. 
+. * Go back to data by reasons and merge "all reasons" and switching data to it
+. use "reasons.dta"
+
+. append using "allreasons.dta" // all reasons
+(note: variable drate_pill was float, now double to accommodate using data's values)
+(note: variable drate_inj was float, now double to accommodate using data's values)
+(note: variable drate_impl was float, now double to accommodate using data's values)
+(note: variable drate_mcondom was float, now double to accommodate using data's values)
+(note: variable drate_lamec was float, now double to accommodate using data's values)
+(note: variable drate_other was float, now double to accommodate using data's values)
+(note: variable drate_allmeth was float, now double to accommodate using data's values)
+
+. append using "switching.dta" // switching 
+
+. append using "method_Ns.dta" // weighted and unweighted numbers
+
+. label def reason 8 "All reasons" 9 "Switching" 10 "Weighted N" 11 "Unweighted N", add
+
+. 
+. * replace empty cells with zeros for each method
+. * and sum the weighted and unweighted Ns into the all methods variable
+. foreach z in drate_allmeth $drate_list {
+  2.         replace `z' = 0 if `z' == .
+  3.         * sum the method Ns to give the total Ns
+.         replace drate_allmeth = drate_allmeth + `z' if reason >= 10
+  4. }
+(2 real changes made)
+(0 real changes made)
+(0 real changes made)
+(2 real changes made)
+(0 real changes made)
+(2 real changes made)
+(3 real changes made)
+(2 real changes made)
+(0 real changes made)
+(2 real changes made)
+(3 real changes made)
+(2 real changes made)
+(0 real changes made)
+(2 real changes made)
+
+.         
+. save "drates_`x'm.dta", replace
+file drates_12m.dta saved
+
+. 
+. 
+. * Step 6
+. * Output results in various ways
+. 
+. * simple output with reasons in rows and methods in columns
+. list reason $drate_list drate_allmeth, tab div abb(16) sep(9) noobs linesize(160)
+
+  +-----------------------------------------------------------------------------------------------------------------------------------+
+  |                          reason | drate_pill | drate_inj | drate_impl | drate_mcondom | drate_lamec | drate_other | drate_allmeth |
+  |---------------------------------+------------+-----------+------------+---------------+-------------+-------------+---------------|
+  |                  Method failure |   3.071256 |  1.004436 |          0 |      2.012593 |    1.054801 |    2.492505 |      1.578645 |
+  |       Desire to become pregnant |   5.590367 |  4.280413 |   1.353072 |      15.31163 |    .8733277 |    1.673769 |      4.441921 |
+  | Other fertility related reasons |   .0444442 |  .5069776 |          0 |        .89911 |    5.086803 |    .4899289 |       .512217 |
+  |    Side effects/health concerns |   9.395296 |  14.47674 |    5.38379 |      3.349708 |           0 |    11.94371 |      10.41175 |
+  |    Wanted more effective method |   2.983462 |  2.258206 |          0 |       5.20434 |           0 |    2.405274 |      2.218379 |
+  |            Other method related |    2.81886 |  .6105709 |   1.008694 |      7.452948 |           0 |    1.004965 |      1.627741 |
+  |                        Other/DK |   2.970416 |  1.805554 |   .7630174 |      8.302976 |    29.09449 |    1.462768 |       3.38234 |
+  |                     All reasons |    26.8741 |   24.9429 |   8.508572 |       42.5333 |    36.10942 |    21.47292 |      24.17299 |
+  |                       Switching |   6.019125 |  5.080995 |   .3349908 |      16.26432 |    4.478137 |    10.09472 |      5.644915 |
+  |---------------------------------+------------+-----------+------------+---------------+-------------+-------------+---------------|
+  |                      Weighted N |   677.8546 |  1156.589 |   380.7531 |      137.4892 |    120.5596 |    224.1756 |      2697.421 |
+  |                    Unweighted N |        579 |      1007 |        370 |            80 |         106 |         166 |          2308 |
+  +-----------------------------------------------------------------------------------------------------------------------------------+
+
+. outsheet reason $drate_list drate_allmeth using `x'm_rates.csv, comma replace   
+(note: file 12m_rates.csv not found)
+
+. 
+. * Outputting as excel file with putexcel        
+. * putexcel output
+. putexcel set "drates_`x'm.xlsx", replace
+Note: file will be replaced when the first putexcel command is issued
+
+. putexcel B1 = "Reasons for discontinuation"
+file drates_12m.xlsx saved
+
+. putexcel A2 = "Contraceptive method"
+file drates_12m.xlsx saved
+
+. * list out the contraceptive methods
+. local row = 2
+
+. foreach method of global methods_list {
+  2.         local row = `row'+1
+  3.         putexcel A`row' = "`method'"
+  4. }
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+
+. 
+. putexcel B3:J`row', nformat(number_d2)
+file drates_12m.xlsx saved
+
+. putexcel K3:L`row', nformat(number)
+file drates_12m.xlsx saved
+
+. 
+. tokenize B C D E F G H I J K L
+
+. local recs = [_N]
+
+. * loop over reasons for discontinuation
+. forvalues j = 1/`recs' {
+  2.         local lab1 : label reason `j'
+  3.         putexcel `1'2 = "`lab1'", txtwrap
+  4.         local k = 2
+  5.         * loop over contraceptive methods
+.         local str
+  6.         foreach i in $drate_list drate_allmeth {
+  7.                 local k = `k'+1
+  8.                 local str `str' `1'`k' = `i'[`j']
+  9.         }
+ 10.         * output results for method
+.         putexcel `str'
+ 11.         mac shift
+ 12. }
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+file drates_12m.xlsx saved
+
+. 
+. 
+. * Converting results dataset into long format for use with other tab commands
+. 
+. * convert results into long format 
+. reshape long drate_, i(reason) j(method_name) string
+(note: j = allmeth impl inj lamec mcondom other pill)
+
+Data                               wide   ->   long
+-----------------------------------------------------------------------------
+Number of obs.                       11   ->      77
+Number of variables                   8   ->       3
+j variable (7 values)                     ->   method_name
+xij variables:
+drate_allmeth drate_impl ... drate_pill   ->   drate_
+-----------------------------------------------------------------------------
+
+. gen method = .
+(77 missing values generated)
+
+. tokenize $meth_list allmeth
+
+. foreach m in $meth_codes 10 {
+  2.         replace method = `m' if method_name == "`1'"
+  3.         mac shift
+  4. }
+(11 real changes made)
+(11 real changes made)
+(11 real changes made)
+(11 real changes made)
+(11 real changes made)
+(11 real changes made)
+(11 real changes made)
+
+. label var method "Contraceptive method"
+
+. label def method                ///
+> 1 "Pill"                        ///
+> 2 "IUD"                         ///
+> 3 "Injectables"                 ///
+> 4 "Implant"                     ///
+> 5 "Male condom"                 ///
+> 6 "Periodic abstinence"         ///
+> 7 "Withdrawal"                  ///
+> 8 "LAM/EC"                      ///
+> 9 "Other"                       ///
+> 10 "All methods"
+
+. label val method method
+
+. 
+. * Now tabulate (using table instead of tab to avoid extra Totals)
+. table method reason [iw=drate_], cellwidth(10) f(%3.1f)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Contracepti |                                                Reason for discontinuation                                               
+ve method   | Method fai Desire to  Other fert Side effec Wanted mor Other meth   Other/DK All reason  Switching Weighted N Unweighted
+------------+-------------------------------------------------------------------------------------------------------------------------
+       Pill |        3.1        5.6        0.0        9.4        3.0        2.8        3.0       26.9        6.0      677.9      579.0
+Injectables |        1.0        4.3        0.5       14.5        2.3        0.6        1.8       24.9        5.1     1156.6     1007.0
+    Implant |                   1.4                   5.4                   1.0        0.8        8.5        0.3      380.8      370.0
+Male condom |        2.0       15.3        0.9        3.3        5.2        7.5        8.3       42.5       16.3      137.5       80.0
+     LAM/EC |        1.1        0.9        5.1                                        29.1       36.1        4.5      120.6      106.0
+      Other |        2.5        1.7        0.5       11.9        2.4        1.0        1.5       21.5       10.1      224.2      166.0
+All methods |        1.6        4.4        0.5       10.4        2.2        1.6        3.4       24.2        5.6     2697.4     2308.0
+--------------------------------------------------------------------------------------------------------------------------------------
+
+. 
+. 
+. * close loop if multiple durations used and file clean up
+. * closing brace if foreach is used for different durations
+. //}
+. 
+. 
+. * clean up working files
+. erase "drates.dta"
+
+. erase "reasons.dta"
+
+. erase "allreasons.dta"
+
+. erase "switching.dta"
+
+. erase "method_Ns.dta"
+
+. 
+end of do-file
+
+. log close
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example9.log
+  log type:  text
+ closed on:   9 Sep 2018, 12:59:57
+------------------------------------------------------------------------------------------------------------------------------------------

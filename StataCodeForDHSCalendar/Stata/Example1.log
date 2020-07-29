@@ -1,0 +1,158 @@
+------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example1.log
+  log type:  text
+ opened on:  31 Aug 2017, 00:30:08
+
+. * DHS Calendar Tutorial - Example 1
+. * Basic string manipulation
+. 
+. * download the model dataset for individual women's recode: "ZZIR62FL.DTA" 
+. * the model datasets are available at http://dhsprogram.com/data/download-model-datasets.cfm
+. 
+. * change to a working directory where the data are stored
+. * or add the full path to the 'use' command below
+. cd "C:\Data\DHS_model"
+C:\Data\DHS_model
+
+. 
+. * open the dataset, selecting just the variables we are going to use
+. use vcal_1 v000 v005 v007 v008 v017 v018 v019 using "ZZIR62FL.DTA", clear
+
+. 
+. 
+. * 1) display column 1 of the calendar for the first 6 respondents
+. list vcal_1 in 1/5
+
+     +----------------------------------------------------------------------------------+
+     |                                                                           vcal_1 |
+     |----------------------------------------------------------------------------------|
+  1. |               00000BPPPPPPPP00000000000000000000000BPPPPPPPP00000000000000000000 |
+  2. |               PPPPPP000000000000000000000000BPPPPPPPP000000000000000000000000000 |
+  3. |               000000000000000000000000000000000000000000000000000000000000000000 |
+  4. |               0000000000BPPPPPPPP00000000000BPPPPPPPP000000000000000000000000000 |
+  5. |               0BPPPPPPPP000000000000000000000000BPPPPPPPP00000000000000000000000 |
+     +----------------------------------------------------------------------------------+
+
+. 
+. 
+. * 2) calculate the full length of calendar by displaying length of strings
+. gen vcal_len = strlen(vcal_1)
+
+. label variable vcal_len "length of calendar"
+
+. list vcal_len in 1/5
+
+     +----------+
+     | vcal_len |
+     |----------|
+  1. |       80 |
+  2. |       80 |
+  3. |       80 |
+  4. |       80 |
+  5. |       80 |
+     +----------+
+
+. 
+. 
+. * 3) take a piece of a string from column 1
+. gen piece = substr(vcal_1,44,12) // start at position 44 for 12 characters
+
+. label variable piece "piece of calendar"
+
+. list piece in 1/5
+
+     +--------------+
+     |        piece |
+     |--------------|
+  1. | 00000000BPPP |
+  2. | 0BPPPPPPPP00 |
+  3. | 000000000000 |
+  4. | 0BPPPPPPPP00 |
+  5. | 00000BPPPPPP |
+     +--------------+
+
+. 
+. 
+. * 4) find the position of a substring within a string
+. gen pos = strpos(vcal_1,"P") // look for first occurrence of "P"
+
+. label variable pos "position in calendar"
+
+. list pos in 1/5
+
+     +-----+
+     | pos |
+     |-----|
+  1. |  21 |
+  2. |  15 |
+  3. |   0 |
+  4. |  26 |
+  5. |  17 |
+     +-----+
+
+. 
+. 
+. * 5) reverse a string
+. gen rev_cal = reverse(vcal_1) // calendar from oldest to most recent month (L to R)
+
+. label variable rev_cal "reversed calendar"
+
+. list rev_cal in 1/5
+
+     +----------------------------------------------------------------------------------+
+     |                                                                          rev_cal |
+     |----------------------------------------------------------------------------------|
+  1. | 00000000000000000000PPPPPPPPB00000000000000000000000PPPPPPPPB00000               |
+  2. | 000000000000000000000000000PPPPPPPPB000000000000000000000000PPPPPP               |
+  3. | 000000000000000000000000000000000000000000000000000000000000000000               |
+  4. | 000000000000000000000000000PPPPPPPPB00000000000PPPPPPPPB0000000000               |
+  5. | 00000000000000000000000PPPPPPPPB000000000000000000000000PPPPPPPPB0               |
+     +----------------------------------------------------------------------------------+
+
+. 
+. 
+. * 6) trim a string of leading and trailing spaces
+. gen trim_cal = trim(vcal_1)
+
+. label variable trim_cal "trimmed calendar"
+
+. list trim_cal in 1/5
+
+     +--------------------------------------------------------------------+
+     |                                                           trim_cal |
+     |--------------------------------------------------------------------|
+  1. | 00000BPPPPPPPP00000000000000000000000BPPPPPPPP00000000000000000000 |
+  2. | PPPPPP000000000000000000000000BPPPPPPPP000000000000000000000000000 |
+  3. | 000000000000000000000000000000000000000000000000000000000000000000 |
+  4. | 0000000000BPPPPPPPP00000000000BPPPPPPPP000000000000000000000000000 |
+  5. | 0BPPPPPPPP000000000000000000000000BPPPPPPPP00000000000000000000000 |
+     +--------------------------------------------------------------------+
+
+. 
+. 
+. * 7) display the length of calendar actually used, from the trimmed version
+. gen vcal_used = strlen(trim_cal)
+
+. label variable vcal_used "length of calendar used"
+
+. * should be the same as v019
+. list vcal_used v019 in 1/5
+
+     +-----------------+
+     | vcal_u~d   v019 |
+     |-----------------|
+  1. |       66     66 |
+  2. |       66     66 |
+  3. |       66     66 |
+  4. |       66     66 |
+  5. |       66     66 |
+     +-----------------+
+
+. 
+end of do-file
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Example1.log
+  log type:  text
+ closed on:  31 Aug 2017, 00:30:08
+------------------------------------------------------------------------------------------------------------------------------------

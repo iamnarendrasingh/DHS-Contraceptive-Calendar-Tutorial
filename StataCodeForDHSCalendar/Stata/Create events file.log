@@ -1,0 +1,609 @@
+------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Create events file.log
+  log type:  text
+ opened on:  31 Aug 2017, 00:30:35
+
+. do "Create events file.do"
+
+. * DHS Calendar Tutorial - Example 7
+. * Create events file
+. 
+. * download the model dataset for individual women's recode: "ZZIR62FL.DTA" 
+. * the model datasets are available at http://dhsprogram.com/data/download-model-datasets.cfm
+. 
+. * change to a working directory where the data are stored
+. * or add the full path to the 'use' command below
+. cd "C:\Data\DHS_model"
+C:\Data\DHS_model
+
+. 
+. * open the dataset to use
+. use caseid v000 v001 v002 v003 v005 v007 v008 v011 v017 v018 v019 v021 v023 v101 v102 v106 ///
+>   v190 vcal_* using "ZZIR62FL.DTA", clear
+
+. 
+. * set up which calendar columns to look at - column numbers can vary across phases of DHS
+. local col1 1 // method use and pregnancies - always column 1
+
+. local col2 2 // reasons for discontinuation - usually column 2
+
+. local col3 3 // marriage - when it exists it is usually column 3
+
+. local marr_col vcal_`col3'
+
+. * check if marriage column exists
+. capture confirm variable vcal_`col3'
+
+. if _rc { // variable does not exist
+.   di "Marriage column does not exist"
+.   local marr_col 
+.   local col3
+. }
+
+. else { // variable exists, but is it empty?
+.   assert vcal_`col3'==""
+.   if !_rc { // variable is empty
+.     di "Marriage column exists but is empty"
+Marriage column exists but is empty
+.     local marr_col 
+.     local col3
+.   }
+.   else {
+.     di "Marriage column exists and contains data"
+.   }
+. }
+
+. 
+. 
+. * Step 7.1
+. * set length of calendar in a local macro
+. local vcal_len = strlen(vcal_`col1'[1])
+
+. * set episode number - initialized to 0
+. gen eps = 0
+
+. * set previous calendar column 1 variable to anything that won't be in the calendar
+. gen prev_vcal1 = "_"
+
+. * create separate variables for each month of the calendar
+. forvalues j = `vcal_len'(-1)1 {
+  2.   local i = `vcal_len' - `j' + 1
+  3.   * contraceptive method, non-use, or birth, pregnancy, or termination
+.   gen vcal1_`i' = substr(vcal_`col1',`j',1)
+  4.   * reason for discontinuation
+.   gen vcal2_`i' = substr(vcal_`col2',`j',1)
+  5. 
+.   * check if we have marriage info
+.   if "`marr_col'"!="" { // we have a marriage column
+  6.     gen vcal3_`i' = substr(vcal_`col3',`j',1)
+  7.     * set up parameter to add into reshape below, and collapse further below
+.     local vcal3_ vcal3_
+  8.     local ev906 ev906a=vcal3_
+  9.   }
+ 10.   * increase the episode number if there is a change in vcal_1
+.   replace eps = eps+1 if vcal1_`i' != prev_vcal1
+ 11.   * set the episode number
+.   gen int ev004`i' = eps 
+ 12.   * save the vcal1 value for the next time through the loop
+.   replace prev_vcal1 = vcal1_`i'
+ 13. }
+(8,347 missing values generated)
+(8,348 real changes made)
+(8,348 real changes made)
+(8,347 missing values generated)
+(253 real changes made)
+(253 real changes made)
+(8,345 missing values generated)
+(305 real changes made)
+(305 real changes made)
+(8,344 missing values generated)
+(370 real changes made)
+(370 real changes made)
+(8,338 missing values generated)
+(398 real changes made)
+(398 real changes made)
+(8,332 missing values generated)
+(391 real changes made)
+(391 real changes made)
+(8,328 missing values generated)
+(393 real changes made)
+(393 real changes made)
+(8,326 missing values generated)
+(363 real changes made)
+(363 real changes made)
+(8,323 missing values generated)
+(284 real changes made)
+(284 real changes made)
+(8,318 missing values generated)
+(247 real changes made)
+(247 real changes made)
+(8,316 missing values generated)
+(214 real changes made)
+(214 real changes made)
+(8,305 missing values generated)
+(245 real changes made)
+(245 real changes made)
+(8,298 missing values generated)
+(287 real changes made)
+(287 real changes made)
+(8,295 missing values generated)
+(284 real changes made)
+(284 real changes made)
+(8,286 missing values generated)
+(330 real changes made)
+(330 real changes made)
+(8,278 missing values generated)
+(426 real changes made)
+(426 real changes made)
+(8,273 missing values generated)
+(430 real changes made)
+(430 real changes made)
+(8,268 missing values generated)
+(364 real changes made)
+(364 real changes made)
+(8,258 missing values generated)
+(378 real changes made)
+(378 real changes made)
+(8,251 missing values generated)
+(366 real changes made)
+(366 real changes made)
+(8,238 missing values generated)
+(324 real changes made)
+(324 real changes made)
+(8,228 missing values generated)
+(304 real changes made)
+(304 real changes made)
+(8,221 missing values generated)
+(270 real changes made)
+(270 real changes made)
+(8,201 missing values generated)
+(260 real changes made)
+(260 real changes made)
+(8,195 missing values generated)
+(337 real changes made)
+(337 real changes made)
+(8,188 missing values generated)
+(309 real changes made)
+(309 real changes made)
+(8,176 missing values generated)
+(344 real changes made)
+(344 real changes made)
+(8,172 missing values generated)
+(425 real changes made)
+(425 real changes made)
+(8,164 missing values generated)
+(413 real changes made)
+(413 real changes made)
+(8,154 missing values generated)
+(415 real changes made)
+(415 real changes made)
+(8,135 missing values generated)
+(403 real changes made)
+(403 real changes made)
+(8,126 missing values generated)
+(404 real changes made)
+(404 real changes made)
+(8,113 missing values generated)
+(366 real changes made)
+(366 real changes made)
+(8,101 missing values generated)
+(300 real changes made)
+(300 real changes made)
+(8,094 missing values generated)
+(275 real changes made)
+(275 real changes made)
+(8,063 missing values generated)
+(274 real changes made)
+(274 real changes made)
+(8,053 missing values generated)
+(337 real changes made)
+(337 real changes made)
+(8,048 missing values generated)
+(294 real changes made)
+(294 real changes made)
+(8,044 missing values generated)
+(323 real changes made)
+(323 real changes made)
+(8,032 missing values generated)
+(388 real changes made)
+(388 real changes made)
+(8,019 missing values generated)
+(425 real changes made)
+(425 real changes made)
+(8,005 missing values generated)
+(403 real changes made)
+(403 real changes made)
+(7,985 missing values generated)
+(376 real changes made)
+(376 real changes made)
+(7,974 missing values generated)
+(377 real changes made)
+(377 real changes made)
+(7,958 missing values generated)
+(317 real changes made)
+(317 real changes made)
+(7,941 missing values generated)
+(302 real changes made)
+(302 real changes made)
+(7,925 missing values generated)
+(294 real changes made)
+(294 real changes made)
+(7,894 missing values generated)
+(291 real changes made)
+(291 real changes made)
+(7,878 missing values generated)
+(443 real changes made)
+(443 real changes made)
+(7,867 missing values generated)
+(429 real changes made)
+(429 real changes made)
+(7,852 missing values generated)
+(375 real changes made)
+(375 real changes made)
+(7,839 missing values generated)
+(417 real changes made)
+(417 real changes made)
+(7,816 missing values generated)
+(432 real changes made)
+(432 real changes made)
+(7,798 missing values generated)
+(462 real changes made)
+(462 real changes made)
+(7,784 missing values generated)
+(441 real changes made)
+(441 real changes made)
+(7,767 missing values generated)
+(421 real changes made)
+(421 real changes made)
+(7,746 missing values generated)
+(405 real changes made)
+(405 real changes made)
+(7,729 missing values generated)
+(397 real changes made)
+(397 real changes made)
+(7,708 missing values generated)
+(388 real changes made)
+(388 real changes made)
+(7,673 missing values generated)
+(407 real changes made)
+(407 real changes made)
+(7,651 missing values generated)
+(519 real changes made)
+(519 real changes made)
+(7,637 missing values generated)
+(451 real changes made)
+(451 real changes made)
+(7,622 missing values generated)
+(436 real changes made)
+(436 real changes made)
+(7,610 missing values generated)
+(435 real changes made)
+(435 real changes made)
+(7,590 missing values generated)
+(409 real changes made)
+(409 real changes made)
+(7,574 missing values generated)
+(386 real changes made)
+(386 real changes made)
+(7,566 missing values generated)
+(1,959 real changes made)
+(1,959 real changes made)
+(7,564 missing values generated)
+(2,799 real changes made)
+(2,799 real changes made)
+(7,564 missing values generated)
+(2,122 real changes made)
+(2,122 real changes made)
+(7,564 missing values generated)
+(1,856 real changes made)
+(1,856 real changes made)
+(7,564 missing values generated)
+(45 real changes made)
+(45 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(7,564 missing values generated)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. * Step 7.2
+. * drop the calendar variables now we have the separate month by month variables
+. drop vcal_* eps prev_vcal1
+
+. 
+. * reshape the new month by month variables into a long format
+. reshape long ev004 vcal1_ vcal2_ `vcal3_', i(caseid) j(i)
+(note: j = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 4
+> 4 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80)
+
+Data                               wide   ->   long
+-----------------------------------------------------------------------------
+Number of obs.                     8348   ->  667840
+Number of variables                 258   ->      22
+j variable (80 values)                    ->   i
+xij variables:
+              ev0041 ev0042 ... ev00480   ->   ev004
+           vcal1_1 vcal1_2 ... vcal1_80   ->   vcal1_
+           vcal2_1 vcal2_2 ... vcal2_80   ->   vcal2_
+-----------------------------------------------------------------------------
+
+. 
+. * update the discontinuation code to a blank if it is empty
+. replace vcal2_ = " " if vcal2_ == ""
+(637,662 real changes made)
+
+. 
+. * label the event number variable
+. label variable ev004 "Event number"
+
+. 
+. 
+. * Step 7.3
+. * create the century month code (CMC) for each month
+. gen cmc=v017+i-1
+
+. 
+. * drop the blank episode after the date of interview
+. drop if i > v019
+(104,322 observations deleted)
+
+. 
+. * capture the variable labels for the v variables
+. foreach v of varlist v* { 
+  2.   local l`v' : variable label `v'
+  3. } 
+
+. * and the value labels for v101 v102 v106 v190
+. foreach v of varlist v1* { 
+  2.   local `v'lbl : value label `v'
+  3. }
+
+. 
+. 
+. * Step 7.4
+. * collapse the episodes within each case, keeping start and end, the event code,
+. * and other useful information
+. collapse (first) v001 v002 v003 v005 v007 v008 v011 v017 v018 v019 v101 v102 v106 v190 ///
+>   (first) ev900=cmc (last) ev901=cmc (count) ev901a=cmc ///
+>   (last) ev902a=vcal1_ ev903a=vcal2_ `ev906', by(caseid ev004)
+
+. 
+. * replace the variable label for all of the v* variables
+. foreach v of varlist v* {
+  2.   label variable `v' `"`l`v''"'
+  3. }
+
+. * and the value labels for v101 v102 v106 v190
+. foreach v of varlist v1* { 
+  2.   label val `v' ``v'lbl'
+  3. }
+
+. 
+. * label the variables created in the collapse statement
+. label variable ev900  "CMC event begins"
+
+. label variable ev901  "CMC event ends"
+
+. label variable ev901a "Duration of event"
+
+. label variable ev902a "Event code (alpha)"
+
+. label variable ev903a "Discontinuation code (alpha)"
+
+. format ev004 %2.0f
+
+. format ev900 ev901 %4.0f
+
+. 
+. 
+. * Step 7.5
+. * convert the event string variable for the episode (ev902a) to numeric (ev902)
+. 
+. * set up a list of codes used in the calendar,
+. * with the position in the string of codes being the code that will be assigned
+. * use a tilde (~) to mark gaps in the coding that are not used for this survey 
+. * Emergency contraception (E), Other modern method (M) and Standard days method (S)
+. * are recent additions as standard codes and may mean something different in earlier surveys
+. * note that some of the codes are survey specific so this will need adjusting
+. * tab vcal1_ to see the full list of codes to handle for the survey you are using
+. local methodlist = "123456789WNALCFEMS~"
+
+. * convert the contraceptive methods to numeric codes, using the position in the string
+. gen ev902 = strpos("`methodlist'",ev902a)
+
+. * now convert the birth, termination and pregnancy codes to 81, 82, 83 respectively
+. gen preg = strpos("BTP",ev902a)
+
+. replace ev902 = preg+80 if preg>0
+(14,884 real changes made)
+
+. drop preg
+
+. * convert the missing code to 99
+. replace ev902 = 99 if ev902a == "?"
+(0 real changes made)
+
+. * now check if there are any codes that were not converted, and change these to -1
+. replace ev902 = -1 if ev902 == 0 & ev902a != "0"
+(0 real changes made)
+
+. 
+. * list cases where the event code was not recoded
+. list caseid ev004 ev902 ev902a if ev902==-1
+
+. 
+. 
+. * Step 7.6
+. * convert the discontinuation string variable for the episode (ev903a) to numeric (ev903)
+. * set up a list of codes used in the calendar
+. * use a tilde (~) to mark gaps in the coding that are not used for this survey 
+. local reasonlist = "123456789CFAD~~~~"
+
+. * convert the reasons for discontinuation to numeric codes, using the position in the string
+. gen ev903 = strpos("`reasonlist'",ev903a) if ev903a != " "
+(31,343 missing values generated)
+
+. * now convert the special codes for other, don't know and missing to 96, 98, 99 respectively
+. gen special = strpos("W~K?",ev903a)
+
+. replace ev903 = special + 95 if special > 0
+(43 real changes made)
+
+. drop special
+
+. * now check if there are any codes that were not converted, and change these to -1.
+. replace ev903 = -1 if ev903 == 0 & ev903a != " "
+(0 real changes made)
+
+. 
+. * list cases where the reason for discontinuation code was not recoded
+. list caseid ev004 ev903 ev903a if ev903==-1
+
+. 
+. 
+. * Step 7.7
+. * capture the previous event and its duration for this respondent
+. by caseid: gen ev904  = ev902[_n-1]  if _n > 1
+(8,348 missing values generated)
+
+. by caseid: gen ev904x = ev901a[_n-1] if _n > 1
+(8,348 missing values generated)
+
+. * capture the following event and its duration for this respondent
+. by caseid: gen ev905  = ev902[_n+1]  if _n < _N
+(8,348 missing values generated)
+
+. by caseid: gen ev905x = ev901a[_n+1] if _n < _N
+(8,348 missing values generated)
+
+. 
+. 
+. * Step 7.8
+. * label the event file variables and values
+. label variable ev902  "Event code"
+
+. label variable ev903  "Discontinuation code"
+
+. label variable ev904  "Prior event code"
+
+. label variable ev904x "Duration of prior event"
+
+. label variable ev905  "Next event code"
+
+. label variable ev905x "Duration of next event"
+
+. label def event ///
+>   0 "No method used" ///
+>   1 "Pill" ///
+>   2 "IUD" ///
+>   3 "Injectable" ///
+>   4 "Diaphragm" ///
+>   5 "Condom" ///
+>   6 "Female sterilization" ///
+>   7 "Male sterilization" ///
+>   8 "Periodic abstinence/Rhythm" ///
+>   9 "Withdrawal" ///
+>  10 "Other traditional methods" ///
+>  11 "Norplant" ///
+>  12 "Abstinence" ///
+>  13 "Lactational amenorrhea method" ///
+>  14 "Female condom" ///
+>  15 "Foam and Jelly" ///
+>  16 "Emergency contraception" ///
+>  17 "Other modern method" ///
+>  18 "Standard days method" ///
+>  81 "Birth" ///
+>  82 "Termination" ///
+>  83 "Pregnancy" ///
+>  99 "Missing" ///
+>  -1 "***Unknown code not recoded***" 
+
+. label def reason ///
+>   0 "No discontinuation" ///
+>   1 "Became pregnant while using" ///
+>   2 "Wanted to become pregnant" ///
+>   3 "Husband disapproved" ///
+>   4 "Side effects" ///
+>   5 "Health concerns" ///
+>   6 "Access/availability" ///
+>   7 "Wanted more effective method" ///
+>   8 "Inconvenient to use" ///
+>   9 "Infrequent sex/husband away" ///
+>  10 "Cost" ///
+>  11 "Fatalistic" ///
+>  12 "Difficult to get pregnant/menopause" ///
+>  13 "Marital dissolution" ///
+>  96 "Other" ///
+>  98 "Don't know" ///
+>  99 "Missing" ///
+>  -1 "***Unknown code not recoded***" 
+
+. label val ev902 event
+
+. label val ev903 reason
+
+. label val ev904 event
+
+. label val ev905 event
+
+. format ev901a ev902 ev903 ev904 ev904x ev905 ev905x %2.0f
+
+. 
+. 
+. * Step 7.9
+. * convert marriage codes to numeric, if it exists
+. capture confirm variable ev906a
+
+. if !_rc { // variable exists
+.   gen ev906 = 7
+.   replace ev906=0 if ev906a=="0"
+.   replace ev906=1 if ev906a=="X"
+.   replace ev906=9 if ev906a=="?"
+.   label variable ev906a "Married at end of episode (alpha)"
+.   label variable ev906  "Married at end of episode"
+.   label def marriage 0 "Not married" 1 "Married" 7 "Unknown code" 9 "Missing" 
+.   label val ev906 marriage
+.   format ev906 %1.0f
+. }
+
+. 
+. 
+. * Step 7.10
+. * save the events file
+. save eventsfile.dta, replace
+file eventsfile.dta saved
+
+. 
+end of do-file
+
+. log close
+      name:  <unnamed>
+       log:  C:\Projects\Analysis\Calendar tutorial\Stata\Create events file.log
+  log type:  text
+ closed on:  31 Aug 2017, 00:30:56
+------------------------------------------------------------------------------------------------------------------------------------
